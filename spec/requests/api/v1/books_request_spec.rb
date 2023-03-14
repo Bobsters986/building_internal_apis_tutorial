@@ -69,7 +69,7 @@ describe "Books API" do
                     summary: 'Filled with suspense.',
                     number_sold: 432
                   })
-    headers = {"CONTENT_TYPE" => "application/json"}
+    headers = { "CONTENT_TYPE" => "application/json" }
 
     post "/api/v1/books", headers: headers, params: JSON.generate(book: book_params)
     created_book = Book.last
@@ -80,5 +80,19 @@ describe "Books API" do
     expect(created_book.summary).to eq(book_params[:summary])
     expect(created_book.genre).to eq(book_params[:genre])
     expect(created_book.number_sold).to eq(book_params[:number_sold])
+  end
+
+  it "can update an existing book" do
+    id = create(:book).id
+    previous_name = Book.last.title
+    book_params = { title: "Charlotte's Web" }
+    headers = { "CONTENT_TYPE" => "application/json" }
+
+    patch "/api/v1/books/#{id}", headers: headers, params: JSON.generate({ book: book_params })
+    book = Book.find_by(id: id)
+
+    expect(response).to be_successful
+    expect(book.title).to_not eq(previous_name)
+    expect(book.title).to eq("Charlotte's Web")
   end
 end
